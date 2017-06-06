@@ -37,7 +37,7 @@ import java.nio.file.Paths;
  * It optionally uses a functional constraint that specified that a person
  * can only live in one location.
  *
- * @author Jay Pujara <jay@cs.umd.edu>
+ * @author Anirudh C
  */
 public class EasyCC {
 	private static final String PARTITION_OBSERVATIONS = "observations";
@@ -97,7 +97,8 @@ public class EasyCC {
 		
 		model.add predicate: "product_quality",	types: [ConstantType.UniqueID];
 		model.add predicate: "user_credibility",	types: [ConstantType.UniqueID];
-		model.add predicate: "ratings",	types: [ConstantType.UniqueID , ConstantType.UniqueID];
+		model.add predicate: "ratings",	types: [ConstantType.UniqueID , ConstantType.UniqueID ];
+		model.add predicate: "rated",	types: [ConstantType.UniqueID , ConstantType.UniqueID ];
 	}
 
 	/**
@@ -110,59 +111,63 @@ public class EasyCC {
 
 		
 		model.add(
-			rule: ( user_credibility(U) & ratings (U,P)) >>  product_quality (P),
+			rule: (rated (U,P) & user_credibility(U) & ratings (U,P)) >>  product_quality (P),
 			squared: config.sqPotentials,
 			weight : 5
 		);
 
 		model.add(
-			rule: ( user_credibility(U) & ~ratings (U,P)) >>  ~product_quality (P),
+			rule: (rated (U,P) & product_quality (P)  & ratings (U,P)) >>  user_credibility(U),
+			squared:config.sqPotentials,
+			weight: 5
+		);
+
+		model.add(
+			rule: (rated (U,P) & user_credibility(U) & ~ratings (U,P)) >>  ~product_quality (P),
 			squared: config.sqPotentials,
 			weight : 5
 		);
 
 	
 		model.add(
-			rule: (product_quality (P)  & ~ratings (U,P)) >>  ~user_credibility(U),
+			rule: (rated (U,P) & product_quality (P)  & ~ratings (U,P)) >>  ~user_credibility(U),
 			squared:config.sqPotentials,
 			weight: 5
 		);
 	
 
-		model.add(
-			rule: (product_quality (P)  & ratings (U,P)) >>  user_credibility(U),
-			squared:config.sqPotentials,
-			weight: 5
-		);
 		
+
+		/*
 		model.add(
 			rule: ( ~user_credibility(U) & ratings (U,P)) >>  ~product_quality (P),
 			squared: config.sqPotentials,
 			weight : 5
 		);
 		
-
+		
 		model.add(
 			rule: (~product_quality (P)  & ratings (U,P)) >>  ~user_credibility(U),
 			squared:config.sqPotentials,
 			weight: 5
 		);
 		
+		*/
 		/*
 		model.add(
-			rule: ~user_credibility(U),
+			rule: user_credibility(U),
 			squared:config.sqPotentials,
 			weight: 1
 		);
 
 		
 		model.add(
-			rule: ~product_quality (P),
+			rule: product_quality (P),
 			squared:config.sqPotentials,
 			weight: 1
 		);
-		
 		*/
+		
 		log.debug("model: {}", model);
 	}
 
@@ -175,11 +180,16 @@ public class EasyCC {
 		Inserter inserter = ds.getInserter(ratings, obsPartition);
 		InserterUtils.loadDelimitedDataTruth(inserter, Paths.get(config.dataPath, "toy1.txt").toString(),",");
 
+		inserter = ds.getInserter(rated, obsPartition);
+		InserterUtils.loadDelimitedDataTruth(inserter, Paths.get(config.dataPath, "rated.txt").toString(),",");
+
 		inserter = ds.getInserter(user_credibility, targetsPartition);
 		InserterUtils.loadDelimitedData(inserter, Paths.get(config.dataPath, "users.txt").toString(),",");
 
 		inserter = ds.getInserter(product_quality, targetsPartition);
 		InserterUtils.loadDelimitedData(inserter, Paths.get(config.dataPath, "products.txt").toString(),",");
+
+		
 
 	}
 
