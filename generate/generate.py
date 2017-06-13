@@ -73,8 +73,20 @@ def generate(no_of_users, no_of_products, no_of_bad_products, no_of_spammers,no_
 	print bad_prods
 
 	for x in bad_users:
+		for y in range(no_of_famous_products,no_of_products):
+			mat[x,y] = 0
+
+	for x in bad_users:
+		for y in range(no_of_famous_products):
+			z = random.randint(0,2)
+			if z == 0:
+				mat[x,y] = 1
+			
+
+
+	for x in bad_users:
 		for y in bad_prods:
-			z = random.randint(0,3)
+			z = random.randint(0,2)
 			if z == 0:
 				mat[x,y] = 1
 
