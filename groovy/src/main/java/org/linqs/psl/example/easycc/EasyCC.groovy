@@ -111,26 +111,26 @@ public class EasyCC {
 
 		
 		model.add(
-			rule: (rated (U,P) & user_credibility(U) & ratings (U,P)) >>  product_quality (P),
+			rule: (ratings (U,P) & user_credibility(U) & ratings (U,P)) >>  product_quality (P),
 			squared: config.sqPotentials,
 			weight : 5
 		);
 
 		model.add(
-			rule: (rated (U,P) & product_quality (P)  & ratings (U,P)) >>  user_credibility(U),
+			rule: (ratings (U,P) & product_quality (P)  & ratings (U,P)) >>  user_credibility(U),
 			squared:config.sqPotentials,
 			weight: 5
 		);
 
 		model.add(
-			rule: (rated (U,P) & user_credibility(U) & ~ratings (U,P)) >>  ~product_quality (P),
+			rule: (ratings (U,P) & user_credibility(U) & ~ratings (U,P)) >>  ~product_quality (P),
 			squared: config.sqPotentials,
 			weight : 5
 		);
 
 	
 		model.add(
-			rule: (rated (U,P) & product_quality (P)  & ~ratings (U,P)) >>  ~user_credibility(U),
+			rule: (ratings (U,P) & product_quality (P)  & ~ratings (U,P)) >>  ~user_credibility(U),
 			squared:config.sqPotentials,
 			weight: 5
 		);
@@ -153,20 +153,22 @@ public class EasyCC {
 		);
 		
 		*/
-		/*
+		
 		model.add(
-			rule: user_credibility(U),
+			//rule: user_credibility(U),
+			rule: "user_credibility(U) = 0.5",
 			squared:config.sqPotentials,
-			weight: 1
+			weight: 1 
 		);
 
 		
 		model.add(
-			rule: product_quality (P),
+			//rule: product_quality (P),
+			rule: "product_quality(P) = 0.5",			
 			squared:config.sqPotentials,
 			weight: 1
 		);
-		*/
+	
 		
 		log.debug("model: {}", model);
 	}
